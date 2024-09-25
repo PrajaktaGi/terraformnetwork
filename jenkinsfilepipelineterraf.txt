@@ -1,0 +1,52 @@
+pipeline { 
+     agent any 
+  
+     parameters { 
+         choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose the Terraform action') 
+     } 
+  
+     stages { 
+         stage('Terraform Init') { 
+             steps { 
+                 // Initialize Terraform using Terraform plugin 
+                 terraformInit(directory: '.', terraformVersion: 'latest') 
+             } 
+         } 
+  
+         stage('Terraform Plan') { 
+             steps { 
+                 // Run Terraform plan using Terraform plugin 
+                 terraformPlan(directory: '.', workspace: 'default') 
+             } 
+         } 
+  
+         stage('Terraform Apply/Destroy') { 
+             steps { 
+                 script { 
+                     if (params.ACTION == 'apply') { 
+                         echo "Running terraform apply..." 
+                         // Apply using Terraform plugin 
+                         terraformApply(directory: '.', workspace: 'default', autoApprove: true) 
+                     } else if (params.ACTION == 'destroy') { 
+                         echo "Running terraform destroy..." 
+                         // Destroy using Terraform plugin 
+                         terraformDestroy(directory: '.', workspace: 'default', autoApprove: true) 
+                     } 
+                 } 
+             } 
+         } 
+     } 
+  
+     post { 
+         always { 
+             // Clean up and finalize actions 
+             echo "Pipeline finished." 
+         } 
+         success { 
+             echo 'Pipeline completed successfully.' 
+         } 
+         failure { 
+             echo 'Pipeline failed.' 
+         } 
+     } 
+ }
