@@ -9,7 +9,7 @@ terraform {
  } 
 
  provider "aws" { 
-   region = "us-west-2" 
+   region = "us-east-1" 
  } 
 #VPC creation
  resource "aws_vpc" "myvpc" {
